@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息</title>
+</head>
+<body>
+    <div id="page-wrapper">
+        <div class="header">
+            <h1 class="page-header">
+                用户信息
+            </h1>
+            <!--可选择返回的不知道叫什么的东西-->
+            <ol class="breadcrumb">
+                <li><a href="../../">{{cou.name}}</a></li>
+                <li class="active">用户信息查看和修改</li>
+            </ol>
+        </div>
+
+        <!--这是我们操作的主题框-->
+        <div id="page-inner">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="card-title">
+                                <div class="title">个人基本信息</div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div>
+                                <label>姓名：{{ user.name }}</label>
+                                <br>
+                                <label>身份证号：{{ user.id_number }}(不可修改)</label>
+                                <br>
+                                <label>联系电话：{{ user.phone_number }}</label>
+                                <br>
+                                {% if user.sex == 1 %}
+                                <label>性别：男</label>
+                                {% endif %}
+                                {% if user.sex == 2 %}
+                                <label>性别：女</label>
+                                {% endif %}
+                                <br>
+                                <label>信用等级计分：{{ user.creditMark }}分（信用等级为0后将禁止网上预约挂号，六个月恢复一个计分）</label>
+                                <br>
+                                <button onclick="show_alter()">修改</button>
+                                <br>
+                            </div>
+                            <form class="user_info" style="display: none" method="post" action="/OnlineRegister/alter_user_info/">
+                                <br>
+                                <label>姓名：</label><input name="name">
+                                <br>
+                                <label>联系电话：</label><input name="phone">
+                                <br>
+                                <label>性别：</label>
+                                <select name="sex">
+                                    <option value="1">男</option>
+                                    <option value="2">女</option>
+                                </select>
+                                <br>
+                                <button>确认修改</button>
+                                <br>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-inner">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="card-title">
+                                <div class="title">预约订单</div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+
+                            <form class="form-horizontal" method="post" action="/OnlineRegister/creat_reservation/">
+                                {% for reservation_order in reservation_orders %}
+                                    <div>
+                                        <label>订单生成时间：<td>{{ reservation_order.createdTime|date:"Y-m-d H:i:s" }}</td></label>
+                                        <br>
+                                        {% for doc_hos in reservation_order.toBeRegistered_id.doctor_id.doctor_hospital_set.all %}
+                                            <label>医院：{{ doc_hos.hospital_id.name }}</label>
+                                        {% endfor %}
+                                        <br>
+                                        {% for doc_dep in reservation_order.toBeRegistered_id.doctor_id.doctor_department_set.all %}
+                                            <label>科室：{{ doc_dep.department_id.name }}</label>
+                                        {% endfor %}
+                                        <br>
+                                        <label>医生：{{ reservation_order.toBeRegistered_id.doctor_id.name  }}({{ reservation_order.toBeRegistered_id.doctor_id.position }})</label>
+                                        <input name="doc_id" value="{{reservation_order.toBeRegistered_id.doctor_id_id}}" style="display: none">
+                                        <br>
+                                        <label>应就诊日期：<td>{{ reservation_order.toBeRegistered_id.date|date:"Y-m-d" }}</td></label>
+                                        <input name="date" value="{{reservation_order.toBeRegistered_id.date|date:"Y-m-d H:i:s"}}" style="display: none">
+                                        <br>
+
+                                        <input name="reservation_order_id" value="{{reservation_order.id}}" style="display: none">
+
+                                        <input name="user_id" value="{{user.id}}" style="display: none">
+                                        <input name="toBeR_id" value="{{reservation_order.toBeRegistered_id_id}}" style="display: none">
+
+                                        <button  type="submit" >付款</button>
+                                        <br>
+                                    </div>
+                                {% endfor %}
+
+                            </form>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-inner">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="card-title">
+                                <div class="title">挂号预约单</div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" method="post" action="/OnlineRegister/del_reservation/">
+                                {% for reservation in reservations %}
+                                    <label>预约单生成时间：<td>{{ reservation.createdTime|date:"Y-m-d H:i:s" }}</td></label>
+                                    <br>
+                                    {% for doc_hos in reservation.doctor_id.doctor_hospital_set.all %}
+                                        <label>医院：{{ doc_hos.hospital_id.name }}</label>
+                                    {% endfor %}
+                                    <br>
+                                    {% for doc_dep in reservation.doctor_id.doctor_department_set.all %}
+                                        <label>科室：{{ doc_dep.department_id.name }}</label>
+                                    {% endfor %}
+                                    <br>
+                                    <label>医生：{{ reservation.doctor_id.name  }}({{ reservation.doctor_id.position }})</label>
+                                    <input name="doc_id" value="{{reservation.doctor_id_id}}" style="display: none">
+                                    <br>
+                                    <label>应就诊日期：<td>{{ reservation.date|date:"Y-m-d" }}</td></label>
+                                    <input name="date" value="{{reservation.date}}" style="display: none">
+
+                                    <input name="reservation_id" value="{{reservation.id}}" style="display: none">
+
+                                    <br>
+                                    {% if reservation.ifJiuZhen == False %}
+                                        {% if reservation.ifValid == True %}
+                                            <button type="submit" >取消预约</button>
+                                        {% elif reservation.ifValid == False %}
+                                            <input disabled="disabled" value="未就诊，已逾期"></input>
+                                        {% endif %}
+
+                                    {% else %}
+                                        <input disabled="disabled" value="已就诊"></input>
+                                    {% endif %}
+                                    <br>
+                                {% endfor %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+<!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 可选的Bootstrap主题文件（一般不使用） -->
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap-theme.min.css"></script>
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        function show_alter() {
+            $('.user_info').show();
+        }
+    </script>
+
+</html>

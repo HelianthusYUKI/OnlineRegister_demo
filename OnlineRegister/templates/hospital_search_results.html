@@ -1,0 +1,7 @@
+<div class="list-hospital-item" style="float: none">
+    {% for hos in hospitals %}
+    <div class="col-sm-12">
+        <label class="hos_list_item" style="font-weight:normal;" onclick="show_dep_of_hos({{ hos.id }})">{{hos.name}}</label>
+    </div>
+    {% endfor %}
+</div>
