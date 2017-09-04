@@ -889,6 +889,7 @@ def show_capacity_for_dep(request):
         raise Http404
 
 def show_doc_list(request):
+    print("show doc list")
     if request.method == "POST":
         #toBeRs = request.POST.get('toBeR')
         hos_id = request.POST.get('hos_id')
